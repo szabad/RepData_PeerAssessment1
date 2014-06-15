@@ -4,7 +4,8 @@
 ## Loading and preprocessing the data
 In this section, I'll present the steps taken to load & pre-process the activity dataset that was provided by the instructor.
 
-```{r ReadData, echo=TRUE}
+
+```r
 setwd("C:/Users/Shadi/datasciencecoursera/Reproducible Research")
 options(scipen = 1, digits = 7)
 activity.data <- read.csv("activity.csv", 
@@ -16,7 +17,8 @@ The read.csv function loads the activity dataset, and the colClasses and na.stri
 
 After reading the activity dataset, the next step is to remove NA values. This can be done by simply invoking the complete.cases function, as shown below:
 
-```{r ProcessData, echo=TRUE}
+
+```r
 procData <- activity.data[complete.cases(activity.data),]
 ```
 
@@ -26,24 +28,40 @@ The processed dataset will be used for the next 2 sections. Then in section 4, w
 
 First, we generate a histogram that shows the total number of steps taken each day:
 
-```{r Histogram1, echo=TRUE}
+
+```r
 sumSteps <- tapply(procData$steps, procData$date, sum)
 hist(sumSteps, main="Histogram of total number of steps taken each day", 
      xlab="Number of steps")
 ```
 
+![plot of chunk Histogram1](figure/Histogram1.png) 
+
 Then we calculate the mean and median of the total number of steps taken each day:
 
-```{r MeanMedian1, echo=TRUE}
+
+```r
 mean(sumSteps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(sumSteps)
+```
+
+```
+## [1] 10765
 ```
 
 ## What is the average daily activity pattern?
 
 First, we generate a time series plot that shows the interval (x-axis) against the average number of steps (averaged across all days):
 
-```{r Interval_TimeSeries1, echo=TRUE}
+
+```r
 avgSteps <- aggregate(procData$steps, list(procData$interval), mean)
 colnames(avgSteps) <- c("Interval", "AvgSteps")
 plot(avgSteps$Interval, avgSteps$AvgSteps, type="l", 
@@ -51,25 +69,38 @@ plot(avgSteps$Interval, avgSteps$AvgSteps, type="l",
      xlab="Interval", ylab="Average number of steps")
 ```
 
+![plot of chunk Interval_TimeSeries1](figure/Interval_TimeSeries1.png) 
+
 Then we find which interval, on average, contains the maximum number of steps:
 
-```{r MaxSteps, echo=TRUE}
+
+```r
 avgSteps[avgSteps$AvgSteps == max(avgSteps$AvgSteps), 1]
+```
+
+```
+## [1] 835
 ```
 
 ## Imputing missing values
 
 First, we find the number of missing values in the original dataset (activity.data):
 
-```{r NumNA, echo=TRUE}
+
+```r
 sum(is.na(activity.data))
+```
+
+```
+## [1] 2304
 ```
 
 Second, my strategy for replacing missing values (i.e. NA values) is to replace the missing value with the mean for that interval, averaged across all days. However, to make the data consistent, I didn't use the raw mean. I rounded the mean to make the number of steps a whole number. 
 
 The implementation of this strategy is shown below: 
 
-```{r ReplaceNA, echo=TRUE}
+
+```r
 for (i in seq(1:nrow(activity.data))){
   if(is.na(activity.data$steps[i])){
     activity.data$steps[i] <- round(
@@ -81,17 +112,32 @@ for (i in seq(1:nrow(activity.data))){
 
 Then, we generate a histogram that shows the total number of steps taken each day in the new and updated dataset:
 
-```{r Histogram2, echo=TRUE}
+
+```r
 sumSteps <- tapply(activity.data$steps, activity.data$date, sum)
 hist(sumSteps, main="Histogram of total number of steps taken each day", 
      xlab="Number of steps")
 ```
 
+![plot of chunk Histogram2](figure/Histogram2.png) 
+
 Then we calculate the mean and median of the total number of steps taken each day in the new and updated dataset:
 
-```{r MeanMedian2, echo=TRUE}
+
+```r
 mean(sumSteps)
+```
+
+```
+## [1] 10765.64
+```
+
+```r
 median(sumSteps)
+```
+
+```
+## [1] 10762
 ```
 
 As shown in the results above, replacing NA values with the mean for that specific interval does change the results slightly. In the histogram, for isntance, the frequency of days where the test subject took between 10,000 and 15,000 steps increased markedly. This isn't surprising, since the number of records with missing values exceeded 2,000 and if those missing values would be replaced, it'll surely some effect on the results. 
@@ -104,7 +150,8 @@ Therefore, imputing missing data in this case did have some impact on the estima
 
 First of all, we create a factor variable (DayType), indicating whether a given date is a weekday or a weekend and add it to the activity.data data frame:
 
-```{r weekFactor, echo=TRUE}
+
+```r
 day.type <- sapply(weekdays(activity.data$date), function(x){
   if (x %in% c("Saturday", "Sunday")){
     x <- "weekend"
@@ -119,14 +166,16 @@ activity.data$DayType <- day.factor
 
 After that, in order to do 2 separate plots for weekdays and weekends, we create 2 subsets of the data as follows: 
 
-```{r SubsetWeekFactor, echo=TRUE}
+
+```r
 weekday.data <- activity.data[activity.data$DayType == "weekday",]
 weekend.data <- activity.data[activity.data$DayType == "weekend",]
 ```
 
 Then, to generate the 2 plots for weekday and weekend data side by side, we do the following: 
 
-```{r Interval_TimeSeries_Panel, echo=TRUE}
+
+```r
 weekdays.avgSteps <- aggregate(weekday.data$steps, 
                               list(weekday.data$interval), mean)
 colnames(weekdays.avgSteps) <- c("Interval", "AvgSteps")
@@ -142,5 +191,7 @@ plot(weekdays.avgSteps$Interval, weekdays.avgSteps$AvgSteps, type="l",
 plot(weekends.avgSteps$Interval, weekends.avgSteps$AvgSteps, type="l", 
      main="Weekends", xlab="Interval", ylab="Average number of steps")
 ```
+
+![plot of chunk Interval_TimeSeries_Panel](figure/Interval_TimeSeries_Panel.png) 
 
 It appears from a preliminary reading of the plots that weekends show a more varied pattern of activity compared to weekdays. 
