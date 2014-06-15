@@ -32,7 +32,7 @@ First, we generate a histogram that shows the total number of steps taken each d
 ```r
 sumSteps <- tapply(procData$steps, procData$date, sum)
 hist(sumSteps, main="Histogram of total number of steps taken each day", 
-     xlab="Number of steps")
+     xlab="Number of steps", col="#528B8B")
 ```
 
 ![plot of chunk Histogram1](figure/Histogram1.png) 
@@ -66,7 +66,7 @@ avgSteps <- aggregate(procData$steps, list(procData$interval), mean)
 colnames(avgSteps) <- c("Interval", "AvgSteps")
 plot(avgSteps$Interval, avgSteps$AvgSteps, type="l", 
      main="Time series plot of interval vs average number of steps", 
-     xlab="Interval", ylab="Average number of steps")
+     xlab="Interval", ylab="Average number of steps", col="#53868B")
 ```
 
 ![plot of chunk Interval_TimeSeries1](figure/Interval_TimeSeries1.png) 
@@ -81,6 +81,8 @@ avgSteps[avgSteps$AvgSteps == max(avgSteps$AvgSteps), 1]
 ```
 ## [1] 835
 ```
+
+Therefore, the interval that contains the maximum number of steps is: 835.
 
 ## Imputing missing values
 
@@ -116,7 +118,7 @@ Then, we generate a histogram that shows the total number of steps taken each da
 ```r
 sumSteps <- tapply(activity.data$steps, activity.data$date, sum)
 hist(sumSteps, main="Histogram of total number of steps taken each day", 
-     xlab="Number of steps")
+     xlab="Number of steps", col="#528B8B")
 ```
 
 ![plot of chunk Histogram2](figure/Histogram2.png) 
@@ -186,10 +188,12 @@ colnames(weekends.avgSteps) <- c("Interval", "AvgSteps")
 
 par(mfrow = c(2, 1))
 plot(weekdays.avgSteps$Interval, weekdays.avgSteps$AvgSteps, type="l", 
-     main="Weekdays", xlab="Interval", ylab="Average number of steps")
+     main="Weekdays", xlab="Interval", 
+     ylab="Average number of steps", col="#53868B")
 
 plot(weekends.avgSteps$Interval, weekends.avgSteps$AvgSteps, type="l", 
-     main="Weekends", xlab="Interval", ylab="Average number of steps")
+     main="Weekends", xlab="Interval", 
+     ylab="Average number of steps", col="#53868B")
 ```
 
 ![plot of chunk Interval_TimeSeries_Panel](figure/Interval_TimeSeries_Panel.png) 
